@@ -140,3 +140,32 @@ create policy "admins delete dental project media" on storage.objects for delete
 
 -- After creating your admin user in Supabase Authentication, run this with their actual UUID:
 -- insert into public.admin_users (user_id) values ('PASTE-AUTH-USER-UUID-HERE');
+
+-- Visitor-shared client contacts. The UUID is the permanent unique record key;
+-- normalized WhatsApp is unique so repeat submissions do not create duplicate people.
+create table if not exists public.shared_contacts (
+  id uuid primary key default gen_random_uuid(),
+  full_name text not null,
+  email text not null,
+  whatsapp text not null,
+  whatsapp_normalized text not null unique,
+  clinic text,
+  consent boolean not null default true,
+  created_at timestamptz not null default now()
+);
+alter table public.shared_contacts enable row level security;
+drop policy if exists "public can share contact details" on public.shared_contacts;
+create policy "public can share contact details" on public.shared_contacts
+  for insert to anon, authenticated
+  with check (
+    length(trim(full_name)) > 0
+    and length(trim(email)) > 3
+    and length(trim(whatsapp)) > 0
+    and length(trim(whatsapp_normalized)) >= 8
+    and consent = true
+  );
+drop policy if exists "admins manage shared contacts" on public.shared_contacts;
+create policy "admins manage shared contacts" on public.shared_contacts
+  for all to authenticated
+  using (public.is_dental_project_admin())
+  with check (public.is_dental_project_admin());
