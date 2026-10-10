@@ -36,7 +36,7 @@ function downloadCommercialContact(settings: Settings) {
   URL.revokeObjectURL(url);
 }
 
-export default function ContactExchange({ settings }: { settings: Settings }) {
+export default function ContactExchange({ settings, compact = false }: { settings: Settings; compact?: boolean }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -86,16 +86,16 @@ export default function ContactExchange({ settings }: { settings: Settings }) {
     setMessage('Thank you! Your contact details have been shared successfully.');
   }
 
-  return <section aria-label="Contact exchange" style={{ background: '#f4f8f8', padding: '12px 20px', borderBottom: '1px solid #e0e9e9' }}>
-    <div style={{ maxWidth: 1120, margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-      <div style={{ maxWidth: 540 }}>
+  return <section aria-label="Contact exchange" style={compact ? { background: 'transparent', padding: 0, border: 0, marginLeft: 'auto', flexShrink: 0 } : { background: '#f4f8f8', padding: '12px 20px', borderBottom: '1px solid #e0e9e9' }}>
+    <div style={compact ? { display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'flex-end', gap: 8 } : { maxWidth: 1120, margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+      {!compact && <div style={{ maxWidth: 540 }}>
         <div style={{ color: '#237f83', fontSize: 11, fontWeight: 800, letterSpacing: '0.13em', textTransform: 'uppercase' }}>Stay connected</div>
         <h2 style={{ margin: '6px 0', color: '#153536', fontSize: 18 }}>Save the commercial contact</h2>
         <p style={{ margin: 0, color: '#586c6d', fontSize: 13, lineHeight: 1.45 }}>Save the representative’s details to your phone, or share your own contact details so they can follow up with you.</p>
-      </div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-        <button type="button" onClick={() => downloadCommercialContact(settings)} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 9, border: 0, borderRadius: 8, padding: '10px 14px', background: '#173c3d', color: '#fff', fontWeight: 700, cursor: 'pointer' }}><ArrowDownToLine size={17}/> Save Commercial Contact</button>
-        <button type="button" onClick={() => { setOpen(true); setMessage(''); setSuccess(false); }} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 9, border: '1px solid #258f93', borderRadius: 8, padding: '13px 17px', background: '#fff', color: '#176c70', fontWeight: 700, cursor: 'pointer' }}><Share2 size={17}/> Share My Contact</button>
+      </div>}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: compact ? 7 : 10 }}>
+        <button type="button" onClick={() => downloadCommercialContact(settings)} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: compact ? 6 : 9, border: 0, borderRadius: 8, padding: compact ? '8px 10px' : '10px 14px', background: '#173c3d', color: '#fff', fontSize: compact ? 11 : 14, whiteSpace: 'nowrap', fontWeight: 700, cursor: 'pointer' }}><ArrowDownToLine size={compact ? 15 : 17}/> Save Contact</button>
+        <button type="button" onClick={() => { setOpen(true); setMessage(''); setSuccess(false); }} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: compact ? 6 : 9, border: '1px solid #258f93', borderRadius: 8, padding: compact ? '8px 10px' : '13px 17px', background: '#fff', color: '#176c70', fontSize: compact ? 11 : 14, whiteSpace: 'nowrap', fontWeight: 700, cursor: 'pointer' }}><Share2 size={compact ? 15 : 17}/> Share Contact</button>
       </div>
     </div>
     {open && <div role="presentation" onMouseDown={e => { if (e.target === e.currentTarget) setOpen(false); }} style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(10,29,30,.65)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, overflowY: 'auto' }}>
